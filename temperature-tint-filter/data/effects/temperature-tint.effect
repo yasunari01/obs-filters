@@ -1,0 +1,58 @@
+uniform float4x4 ViewProj;
+uniform texture2d image;
+
+uniform float temperature;
+uniform float tint;
+uniform float mix_amount;
+
+sampler_state textureSampler {
+	Filter = Linear;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
+struct VertData {
+	float4 pos : POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+VertData VSDefault(VertData vert_in)
+{
+	VertData vert_out;
+	vert_out.pos = mul(float4(vert_in.pos.xyz, 1.0), ViewProj);
+	vert_out.uv = vert_in.uv;
+	return vert_out;
+}
+
+float3 apply_temperature_tint(float3 color)
+{
+	float t = clamp(temperature, -1.0, 1.0);
+	float g = clamp(tint, -1.0, 1.0);
+
+	float3 temp_balance = float3(0.12 * t, 0.02 * abs(t), -0.12 * t);
+	float3 tint_balance = float3(0.08 * max(g, 0.0), -0.10 * g, 0.08 * max(g, 0.0));
+
+	float luma = dot(color, float3(0.2126, 0.7152, 0.0722));
+	float chroma_guard = smoothstep(0.02, 0.35, max(max(color.r, color.g), color.b) - min(min(color.r, color.g), color.b));
+	float tonal_weight = smoothstep(0.02, 0.18, luma) * (1.0 - smoothstep(0.92, 1.0, luma));
+
+	return saturate(color + (temp_balance + tint_balance) * max(chroma_guard, 0.35) * tonal_weight);
+}
+
+float4 PSDrawBare(VertData vert_in) : TARGET
+{
+	float4 original = image.Sample(textureSampler, vert_in.uv);
+	float3 corrected = apply_temperature_tint(original.rgb);
+	float amount = clamp(mix_amount, 0.0, 1.0);
+
+	return float4(lerp(original.rgb, corrected, amount), original.a);
+}
+
+technique Draw
+{
+	pass
+	{
+		vertex_shader = VSDefault(vert_in);
+		pixel_shader = PSDrawBare(vert_in);
+	}
+}

@@ -8,7 +8,9 @@
 ![Download](https://img.shields.io/badge/download-Gumroad-ff90e8)
 -->
 
-> **Note on this repository.** This repo is a public showcase and documentation for a set of filters I develop and distribute as products. The compiled filters are available on Gumroad (pay-what-you-want, free with `0`). The full shader source is **not** included here. This page exists to document the design, the reasoning, and the results.
+> **About this repository.** This repo holds the **full source** of three OBS Studio plugins I designed and shipped — the C filter code, the `.effect` GPU shaders, the CMake build, and the design specs that drove development. Ready-to-install builds are free on Gumroad (pay-what-you-want, enter `0`). See [Repository contents](#repository-contents) for the map.
+>
+> **How these were built.** I'm not a hand-coder — I direct the work. I write the specs, define the scope and architecture, drive the implementation with AI tools, keep it under version control, and log decisions and fixes as I go. The `PROJECT_STATUS.md` and `docs/` files in this repo are that trail, kept intentionally so the *process* is as visible as the result.
 
 ---
 
@@ -95,7 +97,26 @@ A few decisions behind the filters, for anyone curious about the approach:
 - **Tonal control modeled on a grading workflow.** Colorist Tone's pivot + banded midtones mirror how I'd shape an image in Resolve, instead of a single brightness/contrast pair.
 - **Real-time first.** Every choice is constrained by running live on a camera source inside OBS, including feeding the OBS Virtual Camera.
 
-*(Full shader implementations are part of the commercial product and are intentionally not published here.)*
+*The full shader and C implementations live in this repo — see each filter's `src/` and `data/effects/` folder.*
+
+---
+
+## Repository contents
+
+```
+obs-filters/
+├── skinsoft-filter/          # SkinSoft plugin — C source + skin-mask shader
+│   ├── src/                  #   filter logic (C, libobs API)
+│   └── data/effects/         #   skinsoft.effect (GPU shader)
+├── temperature-tint-filter/  # Temperature + Tint plugin
+│   └── data/effects/         #   temperature-tint.effect
+├── colorist-tone-filter/     # Colorist Tone plugin
+│   └── data/effects/         #   colorist-tone.effect
+├── docs/                     # design specs that drove development
+└── PROJECT_STATUS.md         # status, task history, decision log
+```
+
+Each filter is an independent OBS plugin generated from the official [obs-plugintemplate](https://github.com/obsproject/obs-plugintemplate) — its own CMake build, CI workflow, and installer. Build artifacts and dependencies are intentionally excluded (see `.gitignore`); the ready-made installers are on Gumroad.
 
 ---
 

@@ -1,0 +1,116 @@
+uniform float4x4 ViewProj;
+uniform texture2d image;
+
+uniform float hue_center;
+uniform float hue_range;
+uniform float sat_min;
+uniform float sat_max;
+uniform float luma_min;
+uniform float luma_max;
+uniform float mask_softness;
+uniform float smooth_amount;
+uniform float blur_radius;
+uniform float detail_protection;
+uniform float texture_restore;
+uniform bool show_mask;
+
+sampler_state textureSampler {
+	Filter = Linear;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
+struct VertData {
+	float4 pos : POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+VertData VSDefault(VertData vert_in)
+{
+	VertData vert_out;
+	vert_out.pos = mul(float4(vert_in.pos.xyz, 1.0), ViewProj);
+	vert_out.uv = vert_in.uv;
+	return vert_out;
+}
+
+float3 rgb_to_hsv(float3 c)
+{
+	float4 k = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+	float4 p = lerp(float4(c.bg, k.wz), float4(c.gb, k.xy), step(c.b, c.g));
+	float4 q = lerp(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));
+	float d = q.x - min(q.w, q.y);
+	float e = 0.00001;
+	return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+float range_mask(float value, float min_value, float max_value, float softness)
+{
+	float soft = max(softness, 0.001);
+	float low = smoothstep(min_value - soft, min_value + soft, value);
+	float high = 1.0 - smoothstep(max_value - soft, max_value + soft, value);
+	return low * high;
+}
+
+float hue_distance(float a, float b)
+{
+	float d = abs(a - b);
+	return min(d, 1.0 - d);
+}
+
+float skin_mask(float3 color)
+{
+	float3 hsv = rgb_to_hsv(color);
+	float luma = dot(color, float3(0.2126, 0.7152, 0.0722));
+	float soft = mask_softness * 0.18;
+	float hue = 1.0 - smoothstep(max(hue_range - soft, 0.001), hue_range + soft, hue_distance(hsv.x, hue_center));
+	float sat = range_mask(hsv.y, sat_min, sat_max, soft);
+	float lum = range_mask(luma, luma_min, luma_max, soft);
+	return saturate(hue * sat * lum);
+}
+
+float3 soft_blur(float2 uv)
+{
+	float2 texel = float2(ddx(uv.x), ddy(uv.y)) * blur_radius;
+	float3 sum = image.Sample(textureSampler, uv).rgb * 0.28;
+	sum += image.Sample(textureSampler, uv + float2(texel.x, 0.0)).rgb * 0.12;
+	sum += image.Sample(textureSampler, uv - float2(texel.x, 0.0)).rgb * 0.12;
+	sum += image.Sample(textureSampler, uv + float2(0.0, texel.y)).rgb * 0.12;
+	sum += image.Sample(textureSampler, uv - float2(0.0, texel.y)).rgb * 0.12;
+	sum += image.Sample(textureSampler, uv + texel).rgb * 0.06;
+	sum += image.Sample(textureSampler, uv - texel).rgb * 0.06;
+	sum += image.Sample(textureSampler, uv + float2(texel.x, -texel.y)).rgb * 0.06;
+	sum += image.Sample(textureSampler, uv + float2(-texel.x, texel.y)).rgb * 0.06;
+	return sum;
+}
+
+float detail_weight(float3 original, float3 blurred)
+{
+	float edge = length(original - blurred);
+	return 1.0 - smoothstep(0.02, 0.22, edge * detail_protection * 3.0);
+}
+
+float4 PSDrawBare(VertData vert_in) : TARGET
+{
+	float4 original = image.Sample(textureSampler, vert_in.uv);
+	float mask = skin_mask(original.rgb);
+
+	if (show_mask) {
+		return float4(mask, mask, mask, original.a);
+	}
+
+	float3 blurred = soft_blur(vert_in.uv);
+	float protection = detail_weight(original.rgb, blurred);
+	float3 smoothed = lerp(original.rgb, blurred, mask * smooth_amount * protection);
+	float3 restored = lerp(smoothed, original.rgb, mask * texture_restore);
+
+	return float4(restored, original.a);
+}
+
+technique Draw
+{
+	pass
+	{
+		vertex_shader = VSDefault(vert_in);
+		pixel_shader = PSDrawBare(vert_in);
+	}
+}

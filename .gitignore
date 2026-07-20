@@ -1,0 +1,19 @@
+# Build artifacts & dependencies (kept out of the repo on purpose)
+.deps/
+.build-venv/
+build/
+build_*/
+dist/
+release/
+*.pkg
+*.dmg
+*.zip
+
+# Tooling / local caches
+.codebase-memory/
+.DS_Store
+
+# Large media (demos live on the website / Gumroad)
+*.mp4
+*.trec
+*.cmproj/

@@ -1,0 +1,73 @@
+uniform float4x4 ViewProj;
+uniform texture2d image;
+
+uniform float shadows;
+uniform float lower_mids;
+uniform float mids;
+uniform float upper_mids;
+uniform float highlights;
+uniform float contrast;
+uniform float pivot;
+uniform float exposure;
+uniform float mix_amount;
+
+sampler_state textureSampler {
+	Filter = Linear;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
+struct VertData {
+	float4 pos : POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+VertData VSDefault(VertData vert_in)
+{
+	VertData vert_out;
+	vert_out.pos = mul(float4(vert_in.pos.xyz, 1.0), ViewProj);
+	vert_out.uv = vert_in.uv;
+	return vert_out;
+}
+
+float bell(float x, float center, float width)
+{
+	float d = abs(x - center) / width;
+	return saturate(1.0 - d * d);
+}
+
+float3 apply_zone_curve(float3 color)
+{
+	float luma = dot(color, float3(0.2126, 0.7152, 0.0722));
+	float lift = 0.0;
+
+	lift += shadows * bell(luma, 0.08, 0.24);
+	lift += lower_mids * bell(luma, 0.28, 0.25);
+	lift += mids * bell(luma, 0.50, 0.28);
+	lift += upper_mids * bell(luma, 0.72, 0.25);
+	lift += highlights * bell(luma, 0.92, 0.24);
+
+	float3 corrected = color + lift * 0.22;
+	corrected *= exp2(exposure);
+	corrected = (corrected - pivot) * contrast + pivot;
+
+	return saturate(corrected);
+}
+
+float4 PSDrawBare(VertData vert_in) : TARGET
+{
+	float4 original = image.Sample(textureSampler, vert_in.uv);
+	float3 corrected = apply_zone_curve(original.rgb);
+	float amount = clamp(mix_amount, 0.0, 1.0);
+
+	return float4(lerp(original.rgb, corrected, amount), original.a);
+}
+
+technique Draw
+{
+	pass
+	{
+		vertex_shader = VSDefault(vert_in);
+		pixel_shader = PSDrawBare(vert_in);
+	}
+}
