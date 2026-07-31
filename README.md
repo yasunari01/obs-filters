@@ -123,7 +123,7 @@ obs-filters/
 
 Each filter is generated from the official [obs-plugintemplate](https://github.com/obsproject/obs-plugintemplate) — its own CMake build, CI workflow, and installer. Build artifacts and dependencies are excluded on purpose (see [`.gitignore`](.gitignore)); ready-made installers live on Gumroad.
 
-> **How this was built.** I'm not a hand-coder — I direct the work: I write the spec, define scope and architecture, drive the implementation with AI tools, keep it under version control, and log decisions and fixes as I go. The `docs/` and `PROJECT_STATUS.md` are that trail, kept on purpose so the *process* is as visible as the result.
+> **How this was built.** I use AI-assisted development to accelerate implementation while retaining ownership of product definition, system design, integration, debugging, testing, documentation, and release decisions. The colorist judgment behind these filters — what a skin mask has to preserve, where a tone curve should pivot, which artifacts a viewer will notice — is the part no tool supplies. The `docs/` and `PROJECT_STATUS.md` are the working trail, kept on purpose so the *process* is as visible as the result.
 
 📁 **Read the process:** [design spec](docs/design-spec.md) · [implementation plan](docs/implementation-plan.md) · [brand direction](docs/brand-direction.md) · [project status](PROJECT_STATUS.md)
 
