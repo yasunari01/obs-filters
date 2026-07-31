@@ -4,7 +4,7 @@
 
 **Native OBS Studio filter for real-time white balance — move the camera between cooler and warmer tones and correct green/magenta color casts, right inside OBS.**
 
-Part of [OBS Filters by Yasunari Murayama](../README.md) · macOS (Windows planned).
+Part of [OBS Filters by Yasunari Murayama](../README.md) · macOS & Windows x64.
 
 ## What it does
 
@@ -39,6 +39,20 @@ Install into the user's OBS plugin folder, then restart OBS:
 mkdir -p "$HOME/Library/Application Support/obs-studio/plugins"
 ditto "dist/obs-temperature-tint-filter.plugin" "$HOME/Library/Application Support/obs-studio/plugins/obs-temperature-tint-filter.plugin"
 ```
+
+## Build (Windows x64)
+
+Requires Visual Studio 2022 with the C++ desktop workload and the Windows SDK
+(the `windows-x64` preset targets the `Visual Studio 17 2022` generator).
+From this directory, in PowerShell:
+
+```powershell
+.github\scripts\Build-Windows.ps1
+.github\scripts\Package-Windows.ps1
+```
+
+The packaged plugin installs into the OBS Studio plugin folder. A ready-made
+installer is available on the product page below.
 
 ## Source
 
