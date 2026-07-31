@@ -25,11 +25,13 @@
 
 Three OBS Studio filters designed to work **together** — giving a webcam or camera a cleaner, more controlled, slightly cinematic look, without a second camera app or a subscription.
 
-| Filter | What it does | macOS | Windows |
+| Filter | What it does | macOS | Windows x64 |
 |---|---|:---:|:---:|
-| **SkinSoft** | Selective skin smoothing with detail protection | ✅ | ✅ (x64) |
-| **Temperature + Tint** | Visual white balance & color-cast correction | ✅ | Planned |
-| **Colorist Tone** | Exposure, contrast & tonal shaping | ✅ | Planned |
+| **SkinSoft** | Selective skin smoothing with detail protection | ✅ | ✅ |
+| **Temperature + Tint** | Visual white balance & color-cast correction | ✅ | ✅ |
+| **Colorist Tone** | Exposure, contrast & tonal shaping | ✅ | ✅ |
+
+All three are compiled, packaged, and verified loading in OBS Studio on both platforms — `.pkg` installers on macOS, `.exe` installers on Windows. Built against OBS Studio 31.1.1.
 
 > I've worked in video production, color correction, motion design, VFX, and post-production for **15+ years**. These filters bring the way I approach an image in DaVinci Resolve into a real-time OBS workflow.
 
