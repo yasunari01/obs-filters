@@ -35,7 +35,7 @@ All three are compiled, packaged, and verified loading in OBS Studio on both pla
 
 > I've worked in video production, color correction, motion design, VFX, and post-production for **15+ years**. These filters bring the way I approach an image in DaVinci Resolve into a real-time OBS workflow.
 
-**Jump to:** [The filters](#the-filters) · [How they stack](#how-they-work-together) · [Under the hood](#under-the-hood) · [Repo map](#whats-in-this-repo) · [Download](#download)
+**Jump to:** [The filters](#the-filters) · [How they stack](#how-they-work-together) · [Under the hood](#under-the-hood) · [Build from source](#build-from-source) · [Repo map](#whats-in-this-repo) · [Download](#download)
 
 ---
 
@@ -103,6 +103,46 @@ A few decisions behind the filters, for anyone reading the code:
 - **Real-time first.** Every choice is constrained by running live on a camera source, including feeding the OBS Virtual Camera.
 
 Each filter is an independent native plugin: a small C source registers one `OBS_SOURCE_TYPE_FILTER`, loads one `.effect` GPU shader, and exposes clean sliders with defaults, reset, and localization.
+
+---
+
+## Build from source
+
+Each filter is a self-contained CMake project and builds independently.
+
+**Requirements**
+
+- **CMake 3.28 or newer** — required by the OBS plugin template (`CMakePresets.json`). The steps below pin CMake in a local virtual environment so the build doesn't depend on whichever version is installed system-wide.
+- **macOS:** Xcode (the `macos` preset uses the Xcode generator) and Python 3 for the virtual environment.
+- **Windows x64:** Visual Studio 2022 with the C++ desktop workload and the Windows SDK (the `windows-x64` preset targets the `Visual Studio 17 2022` generator), plus PowerShell.
+- OBS Studio headers and prebuilt dependencies are **fetched automatically** by the template's build scripts — versions are pinned in each filter's `buildspec.json` (currently OBS Studio 31.1.1).
+
+**macOS** — replace `skinsoft-filter` with any of the three filter directories:
+
+```bash
+cd skinsoft-filter
+python3 -m venv .build-venv
+.build-venv/bin/python -m pip install --upgrade pip "cmake>=3.30,<3.31"
+.build-venv/bin/cmake --preset macos
+.build-venv/bin/cmake --build --preset macos
+.build-venv/bin/cmake --install build_macos --prefix dist --config RelWithDebInfo
+```
+
+Install into the current user's OBS plugin folder, then restart OBS:
+
+```bash
+mkdir -p "$HOME/Library/Application Support/obs-studio/plugins"
+ditto "dist/obs-skinsoft-filter.plugin" "$HOME/Library/Application Support/obs-studio/plugins/obs-skinsoft-filter.plugin"
+```
+
+**Windows x64** — from the filter directory, using the template's scripts:
+
+```powershell
+.github\scripts\Build-Windows.ps1
+.github\scripts\Package-Windows.ps1
+```
+
+Each filter also carries the template's GitHub Actions workflows for macOS, Windows, and Ubuntu builds, plus `clang-format` and `gersemi` formatting checks.
 
 ---
 
