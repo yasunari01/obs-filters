@@ -98,7 +98,7 @@ The three solve **different** parts of the same problem, so they stack cleanly.
 A few decisions behind the filters, for anyone reading the code:
 
 - **Perceptual skin masking.** Skin is isolated by HSL ranges (not a fixed color key), with a circular-aware hue distance so the red wrap-around is handled correctly. Keeps the mask stable across skin tones and lighting, and makes *Show Mask* genuinely useful for tuning. → [`skinsoft-filter/data/effects/skinsoft.effect`](skinsoft-filter/data/effects/skinsoft.effect)
-- **Detail preservation over brute blur.** Naïve smoothing destroys eyes, hair, and pores. An edge estimate (`original − blurred`) drives *Detail Protection*, and *Texture Restore* mixes original texture back — soft where it should be, sharp where it matters.
+- **Detail preservation over brute blur.** Naïve smoothing destroys eyes, hair, and pores. An edge estimate (`length(original − blurred)`) drives *Detail Protection*, and *Texture Restore* mixes original texture back — soft where it should be, sharp where it matters.
 - **Tonal control modeled on a grading workflow.** Colorist Tone's pivot + banded midtones mirror how I'd shape an image in Resolve, instead of a single brightness/contrast pair.
 - **Real-time first.** Every choice is constrained by running live on a camera source, including feeding the OBS Virtual Camera.
 
