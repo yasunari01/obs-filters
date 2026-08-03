@@ -57,8 +57,8 @@ From this directory, in PowerShell:
 .github\scripts\Package-Windows.ps1
 ```
 
-The packaged plugin installs into the OBS Studio plugin folder. A ready-made
-installer is available on the product page below.
+The scripts resolve the plugin root themselves and write the packaged plugin
+to `release/`. A ready-made installer is available on the product page below.
 
 ## Source
 
