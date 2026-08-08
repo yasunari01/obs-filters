@@ -81,7 +81,19 @@ mkdir -p "$HOME/Library/Application Support/obs-studio/plugins"
 ditto "dist/obs-skinsoft-filter.plugin" "$HOME/Library/Application Support/obs-studio/plugins/obs-skinsoft-filter.plugin"
 ```
 
-Windows build notes: [`WINDOWS_BUILD.md`](WINDOWS_BUILD.md).
+## Build (Windows x64)
+
+Requires Visual Studio 2022 with the C++ desktop workload and the Windows SDK
+(the `windows-x64` preset targets the `Visual Studio 17 2022` generator).
+From this directory, in PowerShell:
+
+```powershell
+.github\scripts\Build-Windows.ps1
+.github\scripts\Package-Windows.ps1
+```
+
+The scripts resolve the plugin root themselves and write the packaged plugin
+to `release/`. A ready-made installer is available on the product page below.
 
 ## Source
 

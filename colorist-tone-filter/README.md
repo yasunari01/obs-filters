@@ -4,7 +4,7 @@
 
 **Native OBS Studio filter for shaping the tonal structure of a camera image — exposure, contrast and banded tonal control for a more cinematic look inside OBS.**
 
-Part of [OBS Filters by Yasunari Murayama](../README.md) · macOS (Windows planned).
+Part of [OBS Filters by Yasunari Murayama](../README.md) · macOS & Windows x64.
 
 <p align="center"><img src="../docs/images/colorist-tone-demo.gif" alt="Colorist Tone controls inside OBS" width="700"></p>
 
@@ -45,6 +45,20 @@ Install into the user's OBS plugin folder, then restart OBS:
 mkdir -p "$HOME/Library/Application Support/obs-studio/plugins"
 ditto "dist/obs-colorist-tone-filter.plugin" "$HOME/Library/Application Support/obs-studio/plugins/obs-colorist-tone-filter.plugin"
 ```
+
+## Build (Windows x64)
+
+Requires Visual Studio 2022 with the C++ desktop workload and the Windows SDK
+(the `windows-x64` preset targets the `Visual Studio 17 2022` generator).
+From this directory, in PowerShell:
+
+```powershell
+.github\scripts\Build-Windows.ps1
+.github\scripts\Package-Windows.ps1
+```
+
+The scripts resolve the plugin root themselves and write the packaged plugin
+to `release/`. A ready-made installer is available on the product page below.
 
 ## Source
 

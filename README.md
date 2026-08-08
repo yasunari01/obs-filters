@@ -25,15 +25,17 @@
 
 Three OBS Studio filters designed to work **together** — giving a webcam or camera a cleaner, more controlled, slightly cinematic look, without a second camera app or a subscription.
 
-| Filter | What it does | macOS | Windows |
+| Filter | What it does | macOS | Windows x64 |
 |---|---|:---:|:---:|
-| **SkinSoft** | Selective skin smoothing with detail protection | ✅ | ✅ (x64) |
-| **Temperature + Tint** | Visual white balance & color-cast correction | ✅ | Planned |
-| **Colorist Tone** | Exposure, contrast & tonal shaping | ✅ | Planned |
+| **SkinSoft** | Selective skin smoothing with detail protection | ✅ | ✅ |
+| **Temperature + Tint** | Visual white balance & color-cast correction | ✅ | ✅ |
+| **Colorist Tone** | Exposure, contrast & tonal shaping | ✅ | ✅ |
+
+All three are compiled, packaged, and verified loading in OBS Studio on both platforms — `.pkg` installers on macOS, `.exe` installers on Windows. Built against OBS Studio 31.1.1.
 
 > I've worked in video production, color correction, motion design, VFX, and post-production for **15+ years**. These filters bring the way I approach an image in DaVinci Resolve into a real-time OBS workflow.
 
-**Jump to:** [The filters](#the-filters) · [How they stack](#how-they-work-together) · [Under the hood](#under-the-hood) · [Repo map](#whats-in-this-repo) · [Download](#download)
+**Jump to:** [The filters](#the-filters) · [How they stack](#how-they-work-together) · [Under the hood](#under-the-hood) · [Build from source](#build-from-source) · [Repo map](#whats-in-this-repo) · [Download](#download)
 
 ---
 
@@ -96,11 +98,51 @@ The three solve **different** parts of the same problem, so they stack cleanly.
 A few decisions behind the filters, for anyone reading the code:
 
 - **Perceptual skin masking.** Skin is isolated by HSL ranges (not a fixed color key), with a circular-aware hue distance so the red wrap-around is handled correctly. Keeps the mask stable across skin tones and lighting, and makes *Show Mask* genuinely useful for tuning. → [`skinsoft-filter/data/effects/skinsoft.effect`](skinsoft-filter/data/effects/skinsoft.effect)
-- **Detail preservation over brute blur.** Naïve smoothing destroys eyes, hair, and pores. An edge estimate (`original − blurred`) drives *Detail Protection*, and *Texture Restore* mixes original texture back — soft where it should be, sharp where it matters.
+- **Detail preservation over brute blur.** Naïve smoothing destroys eyes, hair, and pores. An edge estimate (`length(original − blurred)`) drives *Detail Protection*, and *Texture Restore* mixes original texture back — soft where it should be, sharp where it matters.
 - **Tonal control modeled on a grading workflow.** Colorist Tone's pivot + banded midtones mirror how I'd shape an image in Resolve, instead of a single brightness/contrast pair.
 - **Real-time first.** Every choice is constrained by running live on a camera source, including feeding the OBS Virtual Camera.
 
 Each filter is an independent native plugin: a small C source registers one `OBS_SOURCE_TYPE_FILTER`, loads one `.effect` GPU shader, and exposes clean sliders with defaults, reset, and localization.
+
+---
+
+## Build from source
+
+Each filter is a self-contained CMake project and builds independently.
+
+**Requirements**
+
+- **CMake 3.28 or newer** — required by the OBS plugin template (`CMakePresets.json`). The steps below pin CMake in a local virtual environment so the build doesn't depend on whichever version is installed system-wide.
+- **macOS:** Xcode (the `macos` preset uses the Xcode generator) and Python 3 for the virtual environment.
+- **Windows x64:** Visual Studio 2022 with the C++ desktop workload and the Windows SDK (the `windows-x64` preset targets the `Visual Studio 17 2022` generator), plus PowerShell.
+- OBS Studio headers and prebuilt dependencies are **fetched automatically** by the template's build scripts — versions are pinned in each filter's `buildspec.json` (currently OBS Studio 31.1.1).
+
+**macOS** — replace `skinsoft-filter` with any of the three filter directories:
+
+```bash
+cd skinsoft-filter
+python3 -m venv .build-venv
+.build-venv/bin/python -m pip install --upgrade pip "cmake>=3.30,<3.31"
+.build-venv/bin/cmake --preset macos
+.build-venv/bin/cmake --build --preset macos
+.build-venv/bin/cmake --install build_macos --prefix dist --config RelWithDebInfo
+```
+
+Install into the current user's OBS plugin folder, then restart OBS:
+
+```bash
+mkdir -p "$HOME/Library/Application Support/obs-studio/plugins"
+ditto "dist/obs-skinsoft-filter.plugin" "$HOME/Library/Application Support/obs-studio/plugins/obs-skinsoft-filter.plugin"
+```
+
+**Windows x64** — from the filter directory, using the template's scripts:
+
+```powershell
+.github\scripts\Build-Windows.ps1
+.github\scripts\Package-Windows.ps1
+```
+
+Each filter also carries the template's GitHub Actions workflows for macOS, Windows, and Ubuntu builds, plus `clang-format` and `gersemi` formatting checks.
 
 ---
 
@@ -123,7 +165,7 @@ obs-filters/
 
 Each filter is generated from the official [obs-plugintemplate](https://github.com/obsproject/obs-plugintemplate) — its own CMake build, CI workflow, and installer. Build artifacts and dependencies are excluded on purpose (see [`.gitignore`](.gitignore)); ready-made installers live on Gumroad.
 
-> **How this was built.** I'm not a hand-coder — I direct the work: I write the spec, define scope and architecture, drive the implementation with AI tools, keep it under version control, and log decisions and fixes as I go. The `docs/` and `PROJECT_STATUS.md` are that trail, kept on purpose so the *process* is as visible as the result.
+> **How this was built.** I use AI-assisted development to accelerate implementation while retaining ownership of product definition, system design, integration, debugging, testing, documentation, and release decisions. The colorist judgment behind these filters — what a skin mask has to preserve, where a tone curve should pivot, which artifacts a viewer will notice — is the part no tool supplies. The `docs/` and `PROJECT_STATUS.md` are the working trail, kept on purpose so the *process* is as visible as the result.
 
 📁 **Read the process:** [design spec](docs/design-spec.md) · [implementation plan](docs/implementation-plan.md) · [brand direction](docs/brand-direction.md) · [project status](PROJECT_STATUS.md)
 
