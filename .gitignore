@@ -17,3 +17,7 @@ release/
 *.mp4
 *.trec
 *.cmproj/
+
+# Windows installers built locally
+installer/windows/out/
+*.exe
