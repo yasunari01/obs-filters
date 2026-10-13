@@ -18,7 +18,7 @@ A simple, intuitive white-balance adjustment done **by eye**, the way temperatur
 |---|---|
 | Temperature | Cool ↔ warm shift |
 | Tint | Green ↔ magenta shift |
-| Mix | Blend between original and corrected |
+| Intensity | Blend between original and corrected |
 | Reset | Return to neutral temperature/tint and full mix |
 
 ## Build (macOS)

@@ -24,28 +24,70 @@ VertData VSDefault(VertData vert_in)
 	return vert_out;
 }
 
-float3 apply_temperature_tint(float3 color)
+// SDR/sRGB transfer: this filter receives encoded RGB via GS_RGBA.
+float decode_channel(float v)
+{
+	return v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4);
+}
+
+float encode_channel(float v)
+{
+	return v <= 0.0031308 ? 12.92 * v : 1.055 * pow(v, 1.0 / 2.4) - 0.055;
+}
+
+// Linear sRGB -> XYZ D65 -> Bradford cone responses.
+float3 to_lms(float3 c)
+{
+	float3 xyz = float3(dot(c, float3(0.4124564, 0.3575761, 0.1804375)),
+			    dot(c, float3(0.2126729, 0.7151522, 0.0721750)),
+			    dot(c, float3(0.0193339, 0.1191920, 0.9503041)));
+	return float3(dot(xyz, float3(0.8951, 0.2664, -0.1614)),
+		      dot(xyz, float3(-0.7502, 1.7135, 0.0367)),
+		      dot(xyz, float3(0.0389, -0.0685, 1.0296)));
+}
+
+float3 from_lms(float3 c)
+{
+	float3 xyz = float3(dot(c, float3(0.9869929, -0.1470543, 0.1599627)),
+			    dot(c, float3(0.4323053, 0.5183603, 0.0492912)),
+			    dot(c, float3(-0.0085287, 0.0400428, 0.9684867)));
+	return float3(dot(xyz, float3(3.2404542, -1.5371385, -0.4985314)),
+		      dot(xyz, float3(-0.9692660, 1.8760108, 0.0415560)),
+		      dot(xyz, float3(0.0556434, -0.2040259, 1.0572252)));
+}
+
+float3 white_balance(float3 color, float amount)
 {
 	float t = clamp(temperature, -1.0, 1.0);
 	float g = clamp(tint, -1.0, 1.0);
+	if (amount == 0.0 || (t == 0.0 && g == 0.0))
+		return color;
 
-	float3 temp_balance = float3(0.12 * t, 0.02 * abs(t), -0.12 * t);
-	float3 tint_balance = float3(0.08 * max(g, 0.0), -0.10 * g, 0.08 * max(g, 0.0));
+	float3 linear_rgb = float3(decode_channel(color.r), decode_channel(color.g), decode_channel(color.b));
+	// Relative artistic controls, deliberately not labelled in Kelvin.
+	float3 gains = exp2(float3(0.35 * t + 0.12 * g, -0.12 * g, -0.35 * t + 0.12 * g));
+	float3 white = from_lms(to_lms(float3(1.0, 1.0, 1.0)) * gains);
+	float exposure = dot(white, float3(0.2126, 0.7152, 0.0722));
+	float3 corrected = from_lms(to_lms(linear_rgb) * gains) / exposure;
+	corrected = lerp(linear_rgb, corrected, amount);
 
-	float luma = dot(color, float3(0.2126, 0.7152, 0.0722));
-	float chroma_guard = smoothstep(0.02, 0.35, max(max(color.r, color.g), color.b) - min(min(color.r, color.g), color.b));
-	float tonal_weight = smoothstep(0.02, 0.18, luma) * (1.0 - smoothstep(0.92, 1.0, luma));
-
-	return saturate(color + (temp_balance + tint_balance) * max(chroma_guard, 0.35) * tonal_weight);
+	// Compress out-of-gamut chroma towards a neutral of the same luminance.
+	// Unlike per-channel clipping, this keeps the chroma direction continuous.
+	float y = clamp(dot(corrected, float3(0.2126, 0.7152, 0.0722)), 0.0, 1.0);
+	float3 chroma = corrected - float3(y, y, y);
+	float high = max(max(chroma.r, chroma.g), chroma.b);
+	float low = min(min(chroma.r, chroma.g), chroma.b);
+	float scale = min(1.0, min((1.0 - y) / max(high, 0.000001), y / max(-low, 0.000001)));
+	corrected = saturate(float3(y, y, y) + chroma * scale);
+	return float3(encode_channel(corrected.r), encode_channel(corrected.g), encode_channel(corrected.b));
 }
 
 float4 PSDrawBare(VertData vert_in) : TARGET
 {
 	float4 original = image.Sample(textureSampler, vert_in.uv);
-	float3 corrected = apply_temperature_tint(original.rgb);
 	float amount = clamp(mix_amount, 0.0, 1.0);
 
-	return float4(lerp(original.rgb, corrected, amount), original.a);
+	return float4(white_balance(original.rgb, amount), original.a);
 }
 
 technique Draw
@@ -56,3 +98,4 @@ technique Draw
 		pixel_shader = PSDrawBare(vert_in);
 	}
 }
+

@@ -16,7 +16,8 @@ function(_check_dependencies_windows)
   set(qt6_destination "obs-deps-qt6-VERSION-ARCH")
   set(obs-studio_filename "VERSION.zip")
   set(obs-studio_destination "obs-studio-VERSION")
-  set(dependencies_list prebuilt qt6 obs-studio)
+  # This filter uses only libobs; Qt and the frontend API are disabled.
+  set(dependencies_list prebuilt obs-studio)
 
   _check_dependencies()
 endfunction()

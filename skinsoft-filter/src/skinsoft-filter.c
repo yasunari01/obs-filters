@@ -80,10 +80,10 @@ static void skinsoft_defaults(obs_data_t *settings)
 	obs_data_set_default_double(settings, "luma_min", 18.0);
 	obs_data_set_default_double(settings, "luma_max", 95.0);
 	obs_data_set_default_double(settings, "mask_softness", 35.0);
-	obs_data_set_default_double(settings, "smooth_amount", 35.0);
-	obs_data_set_default_double(settings, "blur_radius", 2.0);
-	obs_data_set_default_double(settings, "detail_protection", 55.0);
-	obs_data_set_default_double(settings, "texture_restore", 25.0);
+	obs_data_set_default_double(settings, "smooth_amount", 65.0);
+	obs_data_set_default_double(settings, "blur_radius", 4.0);
+	obs_data_set_default_double(settings, "detail_protection", 35.0);
+	obs_data_set_default_double(settings, "texture_restore", 20.0);
 	obs_data_set_default_bool(settings, "show_mask", false);
 }
 
@@ -105,19 +105,31 @@ static bool skinsoft_reset(obs_properties_t *props, obs_property_t *property, vo
 static obs_properties_t *skinsoft_properties(void *data)
 {
 	obs_properties_t *props = obs_properties_create();
+	obs_properties_t *mask_props = obs_properties_create();
+	obs_properties_t *smooth_props = obs_properties_create();
+	obs_properties_t *preview_props = obs_properties_create();
 
-	obs_properties_add_float_slider(props, "hue_center", obs_module_text("HueCenter"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "hue_range", obs_module_text("HueRange"), 1.0, 50.0, 1.0);
-	obs_properties_add_float_slider(props, "sat_min", obs_module_text("SaturationMin"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "sat_max", obs_module_text("SaturationMax"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "luma_min", obs_module_text("LumaMin"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "luma_max", obs_module_text("LumaMax"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "mask_softness", obs_module_text("MaskSoftness"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "smooth_amount", obs_module_text("SmoothAmount"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "blur_radius", obs_module_text("BlurRadius"), 0.0, 8.0, 0.25);
-	obs_properties_add_float_slider(props, "detail_protection", obs_module_text("DetailProtection"), 0.0, 100.0, 1.0);
-	obs_properties_add_float_slider(props, "texture_restore", obs_module_text("TextureRestore"), 0.0, 100.0, 1.0);
-	obs_properties_add_bool(props, "show_mask", obs_module_text("ShowMask"));
+	obs_properties_add_bool(preview_props, "show_mask", obs_module_text("ShowMask"));
+
+	obs_properties_add_float_slider(mask_props, "hue_center", obs_module_text("HueCenter"), 0.0, 100.0, 1.0);
+	obs_properties_add_float_slider(mask_props, "hue_range", obs_module_text("HueRange"), 1.0, 50.0, 1.0);
+	obs_properties_add_float_slider(mask_props, "sat_min", obs_module_text("SaturationMin"), 0.0, 100.0, 1.0);
+	obs_properties_add_float_slider(mask_props, "sat_max", obs_module_text("SaturationMax"), 0.0, 100.0, 1.0);
+	obs_properties_add_float_slider(mask_props, "luma_min", obs_module_text("LumaMin"), 0.0, 100.0, 1.0);
+	obs_properties_add_float_slider(mask_props, "luma_max", obs_module_text("LumaMax"), 0.0, 100.0, 1.0);
+	obs_properties_add_float_slider(mask_props, "mask_softness", obs_module_text("MaskSoftness"), 0.0, 100.0, 1.0);
+
+	obs_properties_add_float_slider(smooth_props, "smooth_amount", obs_module_text("SmoothAmount"), 0.0, 100.0,
+					1.0);
+	obs_properties_add_float_slider(smooth_props, "blur_radius", obs_module_text("BlurRadius"), 0.0, 8.0, 0.25);
+	obs_properties_add_float_slider(smooth_props, "detail_protection", obs_module_text("DetailProtection"), 0.0,
+					100.0, 1.0);
+	obs_properties_add_float_slider(smooth_props, "texture_restore", obs_module_text("TextureRestore"), 0.0, 100.0,
+					1.0);
+
+	obs_properties_add_group(props, "preview_group", obs_module_text("PreviewGroup"), OBS_GROUP_NORMAL, preview_props);
+	obs_properties_add_group(props, "mask_group", obs_module_text("MaskGroup"), OBS_GROUP_NORMAL, mask_props);
+	obs_properties_add_group(props, "smooth_group", obs_module_text("SmoothGroup"), OBS_GROUP_NORMAL, smooth_props);
 	obs_properties_add_button(props, "reset", obs_module_text("Reset"), skinsoft_reset);
 
 	UNUSED_PARAMETER(data);

@@ -67,7 +67,9 @@ static obs_properties_t *temperature_tint_properties(void *data)
 {
 	obs_properties_t *props = obs_properties_create();
 
-	obs_properties_add_float_slider(props, "temperature", obs_module_text("Temperature"), -100.0, 100.0, 1.0);
+	obs_property_t *temperature_property = obs_properties_add_float_slider(props, "temperature",
+		obs_module_text("Temperature"), -100.0, 100.0, 1.0);
+	obs_property_set_long_description(temperature_property, obs_module_text("TemperatureHelp"));
 	obs_properties_add_float_slider(props, "tint", obs_module_text("Tint"), -100.0, 100.0, 1.0);
 	obs_properties_add_float_slider(props, "mix", obs_module_text("Mix"), 0.0, 100.0, 1.0);
 	obs_properties_add_button(props, "reset", obs_module_text("Reset"), temperature_tint_reset);
