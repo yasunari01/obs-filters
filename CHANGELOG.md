@@ -40,6 +40,12 @@ so the OBS log still reports `version 1.0.1`.
 
 ## SkinSoft
 
+### Windows package 1.0.1 (2026-10-13)
+
+- Same plugin changes as 1.0.1 for macOS, below.
+- Built with the new Windows installer, which works whichever drive or
+  folder OBS Studio is installed on and removes earlier installs.
+
 ### 1.0.1 (2026-08-06), macOS
 
 - Controls grouped into three steps: preview the mask, select the skin area,
@@ -53,6 +59,12 @@ so the OBS log still reports `version 1.0.1`.
 - First release.
 
 ## Colorist Tone
+
+### Windows package 1.0.0, new installer (2026-10-13)
+
+- Plugin unchanged (the 2026-07-21 build).
+- Repackaged with the new Windows installer, which works whichever drive or
+  folder OBS Studio is installed on and removes earlier installs.
 
 ### 1.0.0 (2026-07-09 macOS, 2026-07-21 Windows)
 

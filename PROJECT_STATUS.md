@@ -10,9 +10,9 @@ copias en discos portátiles.
 
 | Filtro | Código en este repo | macOS en Gumroad | Windows en Gumroad |
 | --- | --- | --- | --- |
-| Temperature + Tint | 1.0.1 | 1.0.1 (`.pkg`) | paquete 1.0.2 listo para subir (reemplaza al 1.0.1) |
-| SkinSoft | 1.0.1 | 1.0.1 (`.pkg`) | sin publicar con el instalador nuevo |
-| Colorist Tone | 1.0.0 | 1.0.0 (`.pkg`) | sin publicar con el instalador nuevo |
+| Temperature + Tint | 1.0.1 | 1.0.1 (`.pkg`) | paquete 1.0.2, publicado el 2026-10-13 |
+| SkinSoft | 1.0.1 | 1.0.1 (`.pkg`) | paquete 1.0.1 con el instalador nuevo, listo para subir |
+| Colorist Tone | 1.0.0 | 1.0.0 (`.pkg`) | paquete 1.0.0 con el instalador nuevo, listo para subir |
 
 Colorist Plus es un producto aparte y no vive en este repositorio.
 
@@ -47,11 +47,13 @@ Pruebas hechas el 2026-10-13 con Temperature + Tint:
 
 - [ ] Revisar a ojo las pantallas del instalador (textos y tamaños). La lógica
       se probó en modo silencioso; falta la revisión visual.
-- [ ] Subir a Gumroad el paquete de Windows 1.0.2 de Temperature + Tint.
-- [ ] Generar y publicar SkinSoft y Colorist Tone para Windows con el
-      instalador nuevo (`build-installers.ps1 -Filter skinsoft` /
-      `-Filter colorist-tone`). El `.dll` de SkinSoft 1.0.1 para Windows ya
-      compila; falta empacarlo y probarlo en OBS.
+- [x] Subir a Gumroad el paquete de Windows 1.0.2 de Temperature + Tint
+      (2026-10-13).
+- [ ] Subir a Gumroad los paquetes de Windows de SkinSoft 1.0.1 y Colorist
+      Tone 1.0.0. Empacados el 2026-10-13 con el instalador nuevo. Probado: el
+      contenido de cada instalador, la prueba en seco y la carga de ambos
+      plugins en OBS 31.1.1. Falta: ejecutar estos dos instaladores de verdad
+      en una PC (con Temperature + Tint sí se hizo; el instalador es el mismo).
 - [ ] Los instaladores de Windows no tienen firma digital: Windows muestra el
       aviso de SmartScreen. El Read me explica cómo continuar.
 - [ ] Un OBS portátil sin archivo `portable_mode.txt` (abierto con
@@ -79,6 +81,7 @@ Pruebas hechas el 2026-10-13 con Temperature + Tint:
 - 2026-09-24: Temperature + Tint 1.0.1 para macOS y Windows: balance de
   blancos, control Intensidad, interfaz en español.
 - 2026-10-13: Instalador nuevo de Windows que funciona con OBS en cualquier
-  disco. Paquete de Windows 1.0.2 de Temperature + Tint. Se sube a este repo el
-  código 1.0.1 de Temperature + Tint y de SkinSoft, que solo existía en copias
-  locales.
+  disco. Paquete de Windows 1.0.2 de Temperature + Tint, publicado en Gumroad.
+  Se sube a este repo el código 1.0.1 de Temperature + Tint y de SkinSoft, que
+  solo existía en copias locales. Se empacan SkinSoft 1.0.1 y Colorist Tone
+  1.0.0 para Windows con el instalador nuevo.
