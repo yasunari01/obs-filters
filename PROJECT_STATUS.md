@@ -11,12 +11,17 @@ copias en discos portátiles.
 | Filtro | Código en este repo | macOS en Gumroad | Windows en Gumroad |
 | --- | --- | --- | --- |
 | Temperature + Tint | 1.0.1 | 1.0.1 (`.pkg`) | paquete 1.0.2, publicado el 2026-10-13 |
-| SkinSoft | 1.0.1 | 1.0.1 (`.pkg`) | paquete 1.0.1 con el instalador nuevo, listo para subir |
-| Colorist Tone | 1.0.0 | 1.0.0 (`.pkg`) | paquete 1.0.0 con el instalador nuevo, listo para subir |
+| SkinSoft | 1.0.1 | 1.0.1 (`.pkg`) | paquete 1.0.2 con el instalador nuevo, listo para subir |
+| Colorist Tone | 1.0.0 | 1.0.0 (`.pkg`) | paquete 1.0.1 con el instalador nuevo, listo para subir |
 
 Colorist Plus es un producto aparte y no vive en este repositorio.
 
 El detalle de cada versión está en [CHANGELOG.md](CHANGELOG.md).
+
+Numeración: el número del paquete de Windows sube cada vez que cambia lo que
+descarga el cliente, aunque solo cambie el instalador. El número que el plugin
+reporta en el log de OBS es el del código del filtro (columna "Código en este
+repo") y solo sube cuando cambia el filtro.
 
 ## Último cambio: instalador de Windows (2026-10-13)
 
@@ -49,8 +54,8 @@ Pruebas hechas el 2026-10-13 con Temperature + Tint:
       se probó en modo silencioso; falta la revisión visual.
 - [x] Subir a Gumroad el paquete de Windows 1.0.2 de Temperature + Tint
       (2026-10-13).
-- [ ] Subir a Gumroad los paquetes de Windows de SkinSoft 1.0.1 y Colorist
-      Tone 1.0.0. Empacados el 2026-10-13 con el instalador nuevo. Probados
+- [ ] Subir a Gumroad los paquetes de Windows de SkinSoft 1.0.2 y Colorist
+      Tone 1.0.1. Empacados el 2026-10-13 con el instalador nuevo. Probados
       con instalación real en modo automático: cada uno quitó su versión
       anterior de `C:\Program Files\obs-studio` y OBS 32.2.1 cargó los tres
       filtros desde `%ProgramData%`. También cargan en OBS 31.1.1 portátil.
@@ -83,5 +88,5 @@ Pruebas hechas el 2026-10-13 con Temperature + Tint:
 - 2026-10-13: Instalador nuevo de Windows que funciona con OBS en cualquier
   disco. Paquete de Windows 1.0.2 de Temperature + Tint, publicado en Gumroad.
   Se sube a este repo el código 1.0.1 de Temperature + Tint y de SkinSoft, que
-  solo existía en copias locales. Se empacan SkinSoft 1.0.1 y Colorist Tone
-  1.0.0 para Windows con el instalador nuevo.
+  solo existía en copias locales. Se empacan SkinSoft 1.0.2 y Colorist Tone
+  1.0.1 para Windows con el instalador nuevo.
