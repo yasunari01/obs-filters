@@ -50,10 +50,10 @@ Pruebas hechas el 2026-10-13 con Temperature + Tint:
 - [x] Subir a Gumroad el paquete de Windows 1.0.2 de Temperature + Tint
       (2026-10-13).
 - [ ] Subir a Gumroad los paquetes de Windows de SkinSoft 1.0.1 y Colorist
-      Tone 1.0.0. Empacados el 2026-10-13 con el instalador nuevo. Probado: el
-      contenido de cada instalador, la prueba en seco y la carga de ambos
-      plugins en OBS 31.1.1. Falta: ejecutar estos dos instaladores de verdad
-      en una PC (con Temperature + Tint sí se hizo; el instalador es el mismo).
+      Tone 1.0.0. Empacados el 2026-10-13 con el instalador nuevo. Probados
+      con instalación real en modo automático: cada uno quitó su versión
+      anterior de `C:\Program Files\obs-studio` y OBS 32.2.1 cargó los tres
+      filtros desde `%ProgramData%`. También cargan en OBS 31.1.1 portátil.
 - [ ] Los instaladores de Windows no tienen firma digital: Windows muestra el
       aviso de SmartScreen. El Read me explica cómo continuar.
 - [ ] Un OBS portátil sin archivo `portable_mode.txt` (abierto con
