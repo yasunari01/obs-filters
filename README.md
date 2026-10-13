@@ -142,6 +142,8 @@ ditto "dist/obs-skinsoft-filter.plugin" "$HOME/Library/Application Support/obs-s
 .github\scripts\Package-Windows.ps1
 ```
 
+The customer-facing `.exe` is built by [`installer/windows`](installer/windows/README.md): one Inno Setup script shared by the three filters that installs correctly whichever drive or folder OBS Studio is on. Release notes are in [CHANGELOG.md](CHANGELOG.md).
+
 Each filter also carries the template's GitHub Actions workflows for macOS, Windows, and Ubuntu builds, plus `clang-format` and `gersemi` formatting checks.
 
 ---

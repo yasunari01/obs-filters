@@ -1,69 +1,84 @@
 # PROJECT_STATUS - Filtros OBS
 
-## Estado Actual
+Última actualización: 2026-10-13.
 
-Activo / Tres plugins independientes compilados, pendiente prueba visual en OBS.
+## Estado actual
 
-Proyecto para crear tres filtros nuevos para OBS como plugins independientes:
+Tres filtros nativos para OBS Studio, publicados en Gumroad. Este repositorio
+es la fuente de verdad del código y del instalador de Windows: no depender de
+copias en discos portátiles.
 
-- Temperature + Tint.
-- Colorist Tone.
-- SkinSoft.
+| Filtro | Código en este repo | macOS en Gumroad | Windows en Gumroad |
+| --- | --- | --- | --- |
+| Temperature + Tint | 1.0.1 | 1.0.1 (`.pkg`) | paquete 1.0.2 listo para subir (reemplaza al 1.0.1) |
+| SkinSoft | 1.0.1 | 1.0.1 (`.pkg`) | sin publicar con el instalador nuevo |
+| Colorist Tone | 1.0.0 | 1.0.0 (`.pkg`) | sin publicar con el instalador nuevo |
 
-## Objetivo
+Colorist Plus es un producto aparte y no vive en este repositorio.
 
-Construir filtros utiles para mejorar imagen/camara en OBS, con controles claros y resultado visual rapido.
+El detalle de cada versión está en [CHANGELOG.md](CHANGELOG.md).
 
-## Siguiente Paso Registrado
+## Último cambio: instalador de Windows (2026-10-13)
 
-Preparar publicacion en pagina web/Gumroad/Facebook y definir siguiente paso de Windows.
+Problema reportado por clientes: el filtro no aparecía en OBS cuando OBS no
+estaba instalado en `C:\Program Files\obs-studio`.
 
-## Bloqueos
+Causa: el instalador 1.0.1 de Temperature + Tint siempre proponía esa carpeta,
+no buscaba OBS y no validaba la carpeta elegida.
 
-- El stack tecnico queda definido: plugins nativos OBS con shaders `.effect`.
-- Cada filtro tiene su propio proyecto, bundle id, instalador `.pkg` y README.
-- CMake del sistema esta en 3.27.8; cada proyecto tiene `.build-venv` con CMake 3.30.9.
-- Falta prueba visual dentro de OBS para Colorist Tone y SkinSoft.
-- Material de lanzamiento creado en `launch-material/`.
-- Zips macOS publicables creados en `release/macOS/`.
-- Windows no esta empaquetado todavia.
+Solución: instalador nuevo y compartido en
+[`installer/windows`](installer/windows/README.md).
 
-## Pendientes
+- Modo automático: instala en `%ProgramData%\obs-studio\plugins\<plugin>`, que
+  OBS lee sin importar en qué disco esté instalado.
+- Modo portátil: el cliente elige la carpeta de OBS y el instalador la valida.
+- Desinstala solo las versiones anteriores para que no tapen a la nueva.
 
-- [ ] Filtro Temperature + Tint
-  - [x] Definir control de temperatura fria/calida.
-  - [x] Definir tint verde/magenta.
-  - [x] Definir rango y valor default.
-  - [x] Crear esqueleto nativo OBS.
-  - [x] Compilar en macOS.
-  - [x] Instalar localmente en la carpeta de plugins de OBS.
-  - [x] Probar con camara/webcam.
-- [ ] Filtro Colorist Tone
-  - [x] Definir controles: sombras, lower mids, mids, upper mids, highlights.
-  - [x] Definir contraste, pivot, exposure y mix.
-  - [x] Crear plugin nativo independiente.
-  - [x] Compilar en macOS.
-  - [x] Instalar localmente en la carpeta de plugins de OBS.
-  - [ ] Probar con material real.
-- [ ] Filtro SkinSoft
-  - [x] Definir mascara manual por hue, saturation y luma.
-  - [x] Definir controles: mask softness, smooth amount, blur radius, detail protection, texture restore, show mask.
-  - [x] Crear plugin nativo independiente.
-  - [x] Compilar en macOS.
-  - [x] Instalar localmente en la carpeta de plugins de OBS.
-  - [ ] Probar con rostro/camara real.
+Pruebas hechas el 2026-10-13 con Temperature + Tint:
 
-## Ideas Pendientes
+- Lógica en seco (`-DryRun`): modo automático, carpeta de OBS, subcarpeta de
+  OBS, carpeta que contiene a OBS y carpeta equivocada.
+- Instalación real en modo automático: quitó las versiones 1.0.0 y 1.0.1 de
+  `C:\Program Files\obs-studio` y OBS 32.2.1 cargó el filtro.
+- OBS 31.1.1 portátil no carga desde `%ProgramData%` (comprobado), por eso
+  existe el modo portátil. Instalación real en modo portátil: correcta.
 
-- Crear presets rapidos: Natural, Stream, Cinematico, Limpio.
-- Comparar antes/despues dentro de OBS.
-- Guardar presets por camara.
-- Crear build Windows y probarlo en OBS para Windows.
-- Convertir logo concept a SVG/PNG final por producto.
+## Pendientes y problemas conocidos
 
-## Historial Corto
+- [ ] Revisar a ojo las pantallas del instalador (textos y tamaños). La lógica
+      se probó en modo silencioso; falta la revisión visual.
+- [ ] Subir a Gumroad el paquete de Windows 1.0.2 de Temperature + Tint.
+- [ ] Generar y publicar SkinSoft y Colorist Tone para Windows con el
+      instalador nuevo (`build-installers.ps1 -Filter skinsoft` /
+      `-Filter colorist-tone`). El `.dll` de SkinSoft 1.0.1 para Windows ya
+      compila; falta empacarlo y probarlo en OBS.
+- [ ] Los instaladores de Windows no tienen firma digital: Windows muestra el
+      aviso de SmartScreen. El Read me explica cómo continuar.
+- [ ] Un OBS portátil sin archivo `portable_mode.txt` (abierto con
+      `--portable`) solo se detecta si está abierto o tiene acceso directo. En
+      otro caso el cliente debe elegir la opción portátil a mano.
+- [ ] `CMakePresets.json` apunta a Visual Studio 2022. Con Visual Studio 2026
+      hay que cambiar el generador a `Visual Studio 18 2026` y el SDK a
+      `10.0.26100` en una copia local, sin subir ese cambio.
+- [ ] El README de SkinSoft todavía describe los nombres de controles y los
+      valores sugeridos de 1.0.0.
+- [ ] Prueba visual con material real de Colorist Tone y SkinSoft.
 
-- 2026-07-09: Se crea proyecto y pendientes iniciales.
-- 2026-07-09: Se decide plugin nativo con shader `.effect`, se crea `obs-colorist-filters`, compila en macOS y se instala localmente.
-- 2026-07-09: Se cambia arquitectura a un plugin por filtro. Se crean `temperature-tint-filter`, `colorist-tone-filter` y `skinsoft-filter`, todos con `.pkg` independiente.
-- 2026-07-09: Se crea launch kit para web, Gumroad y Facebook. Se crean zips macOS individuales y pack completo.
+## Ideas pendientes
+
+- Presets rápidos: Natural, Stream, Cinemático, Limpio.
+- Comparar antes/después dentro de OBS.
+- Guardar presets por cámara.
+
+## Historial corto
+
+- 2026-07-09: Se crea el proyecto. Tres plugins independientes con `.pkg` para
+  macOS.
+- 2026-07-21: Primeros instaladores de Windows (1.0.0) de los tres filtros.
+- 2026-08-06: SkinSoft 1.0.1 para macOS: controles agrupados por pasos.
+- 2026-09-24: Temperature + Tint 1.0.1 para macOS y Windows: balance de
+  blancos, control Intensidad, interfaz en español.
+- 2026-10-13: Instalador nuevo de Windows que funciona con OBS en cualquier
+  disco. Paquete de Windows 1.0.2 de Temperature + Tint. Se sube a este repo el
+  código 1.0.1 de Temperature + Tint y de SkinSoft, que solo existía en copias
+  locales.
